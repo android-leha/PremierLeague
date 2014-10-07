@@ -1,0 +1,90 @@
+{% extends '::base.html.twig' %}
+{% block body %}
+    <div>
+        <div>
+            <table>
+                <tr>
+                    <th>League Table</th>
+                    <th>Match Result</th>
+                </tr>
+                <tr>
+                    <td>
+                        <table>
+                            <thead>
+                            <tr>
+                                <th>Teams</th>
+                                <th>PTS</th>
+                                <th>W</th>
+                                <th>D</th>
+                                <th>L</th>
+                                <th>GD</th>
+                            </tr>
+                            </thead>
+                            <tbody data-bind="foreach: teams">
+                            <tr>
+                                <td data-bind="text: name"></td>
+                                <td data-bind="text: pts"></td>
+                                <td data-bind="text: w"></td>
+                                <td data-bind="text: d"></td>
+                                <td data-bind="text: l"></td>
+                                <td data-bind="text: gd"></td>
+                            </tr>
+                            </tbody>
+                        </table>
+                    </td>
+                    <td>
+                        <h3 data-bind="if: week"><span data-bind="text: week">0</span>th Week Match Result</h3>
+                        <ul data-bind="foreach: games">
+                            <li>
+                                <b data-bind="text: firstTeam"></b>
+                                <span data-bind="text: firstScore"></span>
+                                -
+                                <span data-bind="text: secondScore"></span>
+                                <b data-bind="text: secondTeam"></b></li>
+                        </ul>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2">
+                        <button>Play All</button>
+                        <button  data-bind="click: play">Next Week</button>
+                    </td>
+                </tr>
+            </table>
+        </div>
+        <div id="predication"></div>
+    </div>
+{% endblock %}
+
+{% block javascripts %}
+    {{ parent() }}
+    <script type="text/javascript">
+        $(function () {
+            var Model = function () {
+                var self = this;
+                self.teams = ko.observableArray([]);
+                self.games = ko.observableArray([]);
+                self.week = ko.observable(0)
+                self.load = function () {
+                    $.get("{{ path('load') }}", function (data) {
+                        self.teams(data);
+                    }, "json");
+                };
+                self.load();
+
+                self.play = function () {
+                    $.get("{{ path('play') }}", function (data) {
+                        if (data.error) {
+                            alert(data.error);
+                            return;
+                        }
+                        self.week(data.week);
+                        self.games(data.games);
+                        self.load();
+                    }, "json");
+                }
+            };
+            ko.applyBindings(new Model());
+        })
+    </script>
+{% endblock %}

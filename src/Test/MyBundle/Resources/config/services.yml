@@ -1,0 +1,3 @@
+services:
+  league:
+    class: Test\MyBundle\Model\League
