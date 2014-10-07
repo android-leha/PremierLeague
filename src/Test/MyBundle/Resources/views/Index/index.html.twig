@@ -1,58 +1,53 @@
 {% extends '::base.html.twig' %}
 {% block body %}
-    <div>
-        <div>
-            <table>
+    <div class="alert alert-warning">Reload this page to restart league</div>
+    <div class="row well">
+        <div class="col-md-4">
+            <h2>League Table</h2>
+            <table class="table">
+                <thead>
                 <tr>
-                    <th>League Table</th>
-                    <th>Match Result</th>
+                    <th>Teams</th>
+                    <th>PTS</th>
+                    <th>W</th>
+                    <th>D</th>
+                    <th>L</th>
+                    <th>GD</th>
                 </tr>
+                </thead>
+                <tbody data-bind="foreach: teams">
                 <tr>
-                    <td>
-                        <table>
-                            <thead>
-                            <tr>
-                                <th>Teams</th>
-                                <th>PTS</th>
-                                <th>W</th>
-                                <th>D</th>
-                                <th>L</th>
-                                <th>GD</th>
-                            </tr>
-                            </thead>
-                            <tbody data-bind="foreach: teams">
-                            <tr>
-                                <td data-bind="text: name"></td>
-                                <td data-bind="text: pts"></td>
-                                <td data-bind="text: w"></td>
-                                <td data-bind="text: d"></td>
-                                <td data-bind="text: l"></td>
-                                <td data-bind="text: gd"></td>
-                            </tr>
-                            </tbody>
-                        </table>
-                    </td>
-                    <td>
-                        <h3 data-bind="if: week"><span data-bind="text: week">0</span>th Week Match Result</h3>
-                        <ul data-bind="foreach: games">
-                            <li>
-                                <b data-bind="text: firstTeam"></b>
-                                <span data-bind="text: firstScore"></span>
-                                -
-                                <span data-bind="text: secondScore"></span>
-                                <b data-bind="text: secondTeam"></b></li>
-                        </ul>
-                    </td>
+                    <td data-bind="text: name"></td>
+                    <td data-bind="text: pts"></td>
+                    <td data-bind="text: w"></td>
+                    <td data-bind="text: d"></td>
+                    <td data-bind="text: l"></td>
+                    <td data-bind="text: gd"></td>
                 </tr>
-                <tr>
-                    <td colspan="2">
-                        <button>Play All</button>
-                        <button  data-bind="click: play">Next Week</button>
-                    </td>
-                </tr>
+                </tbody>
             </table>
         </div>
-        <div id="predication"></div>
+        <div class="col-md-4">
+            <h2>Match Result</h2>
+            <h3 data-bind="if: week"><span data-bind="text: week">0</span> Week Match Result</h3>
+            <ul data-bind="foreach: games">
+                <li>
+                    <b data-bind="text: firstTeam"></b>
+                    <span data-bind="text: firstScore"></span>
+                    -
+                    <span data-bind="text: secondScore"></span>
+                    <b data-bind="text: secondTeam"></b></li>
+            </ul>
+        </div>
+        <div class="col-md-4"></div>
+    </div>
+    <div class="row">
+        <div class="col-md-6">
+            <button class="btn">Play All</button>
+        </div>
+        <div class="col-md-4">
+            <button class="btn" data-bind="click: play">Next Week</button>
+        </div>
     </div>
 {% endblock %}
 
