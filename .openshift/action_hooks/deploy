@@ -1,0 +1,39 @@
+#!/bin/bash
+
+export COMPOSER_HOME="${OPENSHIFT_DATA_DIR}/.composer"
+
+# Install or update composer
+if [ ! -f "${OPENSHIFT_DATA_DIR}composer.phar" ]; then
+    curl -s https://getcomposer.org/installer | php -- --install-dir=${OPENSHIFT_DATA_DIR}
+else
+    php $OPENSHIFT_DATA_DIR/composer.phar self-update
+fi
+
+cd ${OPENSHIFT_REPO_DIR}
+php ${OPENSHIFT_DATA_DIR}composer.phar install --prefer-dist --no-dev
+
+php ${OPENSHIFT_REPO_DIR}app/console cache:clear --env=dev # TODO: check in documentation, if it necessary
+
+chmod -R 0777 ${OPENSHIFT_REPO_DIR}app/cache
+chmod -R 0777 ${OPENSHIFT_REPO_DIR}app/logs
+
+# Create symlink to public folder
+ln -sf ${OPENSHIFT_REPO_DIR}web ${OPENSHIFT_REPO_DIR}php
+
+# Create parameters.yml
+echo "parameters:" > app/config/parameters.yml
+echo "  database_driver: pdo_pgsql" >> app/config/parameters.yml
+echo "  database_host: ${OPENSHIFT_POSTGRESQL_DB_HOST}" >> app/config/parameters.yml
+echo "  database_port: ${OPENSHIFT_POSTGRESQL_DB_PORT}" >> app/config/parameters.yml
+echo "  database_name: ${PGDATABASE}" >> app/config/parameters.yml
+echo "  database_user: ${OPENSHIFT_POSTGRESQL_DB_USERNAME}" >> app/config/parameters.yml
+echo "  database_password: ${OPENSHIFT_POSTGRESQL_DB_PASSWORD}" >> app/config/parameters.yml
+echo "  mailer_transport: smtp" >> app/config/parameters.yml
+echo "  mailer_host: 127.0.0.1" >> app/config/parameters.yml
+echo "  mailer_user: null" >> app/config/parameters.yml
+echo "  mailer_password: null" >> app/config/parameters.yml
+echo "  locale: ru" >> app/config/parameters.yml
+echo "  secret: hellroy" >> app/config/parameters.yml
+
+# Update database scheme
+php app/console doctrine:schema:update --force
