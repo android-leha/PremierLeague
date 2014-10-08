@@ -35,6 +35,8 @@ class Team implements \JsonSerializable
         } else {
             $firstTeam->getScore()->pts++;
             $secondTeam->getScore()->pts++;
+            $firstTeam->getScore()->d++;
+            $secondTeam->getScore()->d++;
         }
         $firstTeam->getScore()->p++;
         $firstTeam->getScore()->gf += $firstScore;

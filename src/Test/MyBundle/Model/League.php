@@ -18,18 +18,36 @@ class League
     {
         $this->teams = $teams;
 
+        // Round-Robin Tournament
         $teamsCount = count($teams);
-        $gamesCount = $teamsCount * ($teamsCount - 1);
-        $round = 0;
-        for ($i = 0; $i < $gamesCount; $i++) {
-            if (($i % $teamsCount) == 0) {
-                $round++;
+        if ($teamsCount % 2 > 0) {
+            $teamsCount++;
+            $teams[] = new EmptyTeam();
+        }
+        $K = $teamsCount / 2;
+
+
+        $gamesCount = $teamsCount * ($teamsCount - 1) / 2;
+        $weeksCount = $gamesCount / $K;
+
+        for ($j = 0; $j < $weeksCount; $j++) {
+            $weekMatrix = array();
+            $row = $this->row($j, $teamsCount);
+            $weekMatrix[0][1] = $teams[0];
+            $inverseWeekMatrix[0][0] = $weekMatrix[0][1];
+            for ($i = 0; $i < $teamsCount; $i++) {
+                if ($i === 0) {
+                    continue;
+                } elseif ($i < $K) {
+                    $weekMatrix[$i][1] = $teams[array_shift($row)];
+                    $inverseWeekMatrix[$i][0] = $weekMatrix[$i][1];
+                } else {
+                    $weekMatrix[$teamsCount - $i - 1][0] = $teams[array_shift($row)];
+                    $inverseWeekMatrix[$teamsCount - $i - 1][1] = $weekMatrix[$teamsCount - $i - 1][0];
+                }
             }
-            $k = $i + $round;
-            $week = (string) (floor($i / 2) + 1);
-            $firstTeam = $teams[$i % $teamsCount];
-            $secondTeam = $teams[$k % $teamsCount];
-            $this->gamesByWeeks[$week][] = array($firstTeam, $secondTeam);
+            $this->gamesByWeeks[] = $weekMatrix;
+            $this->gamesByWeeks[] = $inverseWeekMatrix;
         }
     }
 
@@ -58,9 +76,7 @@ class League
             function (Team $a, Team $b) {
                 $aScore = $a->getScore();
                 $bScore = $b->getScore();
-//                echo 's ' . $aScore->pts . ' ' . $bScore->pts;
                 if ($aScore->pts < $bScore->pts) {
-//                    echo 'Big' . PHP_EOL;
                     return 1;
                 } elseif ($aScore->pts > $bScore->pts) {
                     return -1;
@@ -86,5 +102,23 @@ class League
     public function getWeek()
     {
         return $this->weekNumber;
+    }
+
+    /**
+     * @param $j
+     * @param $teamsCount
+     * @return array
+     */
+    private function row($j, $teamsCount)
+    {
+        $row = array();
+        for ($i = 1; $i < $teamsCount; $i++) {
+            $row[] = $i;
+        }
+        for ($k = 0; $k < $j; $k++) {
+            $last = array_pop($row);
+            $row = array_merge([$last], $row);
+        }
+        return $row;
     }
 } 
