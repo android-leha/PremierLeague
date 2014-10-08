@@ -1,10 +1,11 @@
 {% extends '::base.html.twig' %}
 {% block body %}
-    <div class="alert alert-warning">Reload this page to restart league</div>
+    <h1>Premier League</h1>
+    <div class="alert alert-warning">Reload this page to restart The League</div>
     <div class="row well">
         <div class="col-md-4">
             <h2>League Table</h2>
-            <table class="table">
+            <table class="table table-hover">
                 <thead>
                 <tr>
                     <th>Teams</th>
@@ -29,21 +30,34 @@
         </div>
         <div class="col-md-4">
             <h2>Match Result</h2>
-            <h3 data-bind="if: week"><span data-bind="text: week">0</span> Week Match Result</h3>
-            <ul data-bind="foreach: games">
-                <li>
+            <h4 data-bind="visible: week"><span data-bind="text: week"></span> Week</h4>
+            <div data-bind="foreach: games">
+                <div>
                     <b data-bind="text: firstTeam"></b>
                     <span data-bind="text: firstScore"></span>
                     -
                     <span data-bind="text: secondScore"></span>
-                    <b data-bind="text: secondTeam"></b></li>
-            </ul>
+                    <b data-bind="text: secondTeam"></b>
+                </div>
+            </div>
+            <div data-bind="foreach: weeks">
+                <h5>-----</h5>
+                <div data-bind="foreach: $data">
+                    <div>
+                        <b data-bind="text: firstTeam"></b>
+                        <span data-bind="text: firstScore"></span>
+                        -
+                        <span data-bind="text: secondScore"></span>
+                        <b data-bind="text: secondTeam"></b>
+                    </div>
+                </div>
+            </div>
         </div>
         <div class="col-md-4"></div>
     </div>
     <div class="row">
         <div class="col-md-6">
-            <button class="btn">Play All</button>
+            <button class="btn" data-bind="click: playAll">Play All</button>
         </div>
         <div class="col-md-4">
             <button class="btn" data-bind="click: play">Next Week</button>
@@ -59,7 +73,8 @@
                 var self = this;
                 self.teams = ko.observableArray([]);
                 self.games = ko.observableArray([]);
-                self.week = ko.observable(0)
+                self.weeks = ko.observableArray([]);
+                self.week = ko.observable(0);
                 self.load = function () {
                     $.get("{{ path('load') }}", function (data) {
                         self.teams(data);
@@ -77,7 +92,15 @@
                         self.games(data.games);
                         self.load();
                     }, "json");
-                }
+                };
+                self.playAll = function () {
+                    $.get("{{ path('all') }}", function (data) {
+                        self.week(0);
+                        self.games([]);
+                        self.weeks(data.weeks);
+                        self.load();
+                    }, "json");
+                };
             };
             ko.applyBindings(new Model());
         })

@@ -12,7 +12,9 @@
         <link rel="icon" type="image/x-icon" href="{{ asset('favicon.ico') }}" />
     </head>
     <body>
-        {% block body %}{% endblock %}
+        <div class="container-fluid">
+            {% block body %}{% endblock %}
+        </div>
         {% block javascripts %}
             <script type="text/javascript" src="{{ asset('bundles/jquery/js/jquery.min.js') }}"></script>
             <script type="text/javascript" src="{{ asset('bundles/hexmediaknockout/js/knockout.min.js') }}"></script>

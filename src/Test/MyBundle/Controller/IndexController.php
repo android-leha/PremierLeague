@@ -19,12 +19,14 @@ class IndexController extends Controller
      */
     public function indexAction()
     {
-        $premiereLeague = new League([
+        $premiereLeague = new League(
+            [
                 new Team("Manchester City", 1.79),
                 new Team("Chelsea", 1.88),
                 new Team("Arsenal", 1.75),
                 new Team("Liverpool", 1.6),
-            ]);
+            ]
+        );
         $this->get("session")->set("league", $premiereLeague);
         $this->get("session")->save();
         return array();
@@ -35,7 +37,8 @@ class IndexController extends Controller
      *
      * @return JsonResponse
      */
-    public function loadData() {
+    public function loadData()
+    {
         $premiereLeague = $this->getLeague();
 
         return new JsonResponse($premiereLeague->getResultTable());
@@ -60,6 +63,26 @@ class IndexController extends Controller
         } catch (\Exception $e) {
             return new JsonResponse(['error' => $e->getMessage()]);
         }
+    }
+
+    /**
+     * @Config\Route("/all", name="all")
+     *
+     * return JsonResponse
+     */
+    public function allAction()
+    {
+        $results = array();
+        try {
+            $premiereLeague = $this->getLeague();
+            while (true) {
+                $results[] = $premiereLeague->playWeek();
+            }
+        } catch (\Exception $e) {
+        }
+        return new JsonResponse([
+                'weeks' => $results,
+            ]);
     }
 
     /**
