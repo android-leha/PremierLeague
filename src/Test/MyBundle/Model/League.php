@@ -10,6 +10,7 @@ class League
     private $gamesByWeeks = array();
 
     private $weekNumber = 0;
+    private $gamesCount;
 
     /**
      * @param Team[] $teams
@@ -27,8 +28,8 @@ class League
         $K = $teamsCount / 2;
 
 
-        $gamesCount = $teamsCount * ($teamsCount - 1) / 2;
-        $weeksCount = $gamesCount / $K;
+        $this->gamesCount = $teamsCount * ($teamsCount - 1) / 2;
+        $weeksCount = $this->gamesCount / $K;
 
         for ($j = 0; $j < $weeksCount; $j++) {
             $weekMatrix = array();
@@ -120,5 +121,29 @@ class League
             $row = array_merge([$last], $row);
         }
         return $row;
+    }
+
+    public function getPredictions()
+    {
+        $results = $this->getResultTable();
+        $attack = 0;
+        $defence = 0;
+        foreach ($results as $team) {
+            $attack += $team->getAttackPower();
+            $defence += $team->getDefencePower();
+        }
+
+        $out = array();
+        foreach ($results as $team) {
+
+            $out[] = array(
+                'name' => (string) $team,
+                'prediction' => (round(
+                        ($team->getAttackPower() / $attack - $team->getDefencePower() / $defence) * 100)
+                    + 100 / count($this->teams)) . '%',
+            );
+        }
+
+        return $out;
     }
 } 

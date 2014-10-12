@@ -53,7 +53,12 @@
                 </div>
             </div>
         </div>
-        <div class="col-md-4"></div>
+        <div class="col-md-4">
+            <h3>Next week predictions</h3>
+            <div data-bind="foreach: predictions">
+                <div><b data-bind="text: name"></b>: <span data-bind="text: prediction"></span></div>
+            </div>
+        </div>
     </div>
     <div class="row">
         <div class="col-md-6">
@@ -74,6 +79,7 @@
                 self.teams = ko.observableArray([]);
                 self.games = ko.observableArray([]);
                 self.weeks = ko.observableArray([]);
+                self.predictions = ko.observableArray([]);
                 self.week = ko.observable(0);
                 self.load = function () {
                     $.get("{{ path('load') }}", function (data) {
@@ -91,6 +97,7 @@
                         self.week(data.week);
                         self.games(data.games);
                         self.load();
+                        self.loadPredictions();
                     }, "json");
                 };
                 self.playAll = function () {
@@ -99,8 +106,14 @@
                         self.games([]);
                         self.weeks(data.weeks);
                         self.load();
+                        self.loadPredictions();
                     }, "json");
                 };
+                self.loadPredictions = function () {
+                    $.get("{{ path('predictions') }}", function (data) {
+                        self.predictions(data);
+                    }, "json");
+                }
             };
             ko.applyBindings(new Model());
         })

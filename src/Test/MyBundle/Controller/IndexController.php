@@ -22,9 +22,9 @@ class IndexController extends Controller
         $premiereLeague = new League(
             [
                 new Team("Manchester City", 1.79),
-                new Team("Chelsea", 1.88),
+                new Team("Chelsea", 1.83),
                 new Team("Arsenal", 1.75),
-                new Team("Liverpool", 1.6),
+                new Team("Liverpool", 1.65),
             ]
         );
         $this->get("session")->set("league", $premiereLeague);
@@ -80,9 +80,22 @@ class IndexController extends Controller
             }
         } catch (\Exception $e) {
         }
-        return new JsonResponse([
+        return new JsonResponse(
+            [
                 'weeks' => $results,
-            ]);
+            ]
+        );
+    }
+
+    /**
+     * @Config\Route("/predictions", name="predictions")
+     *
+     * return JsonResponse
+     */
+    public function predictionsAction()
+    {
+        $premiereLeague = $this->getLeague();
+        return new JsonResponse($premiereLeague->getPredictions());
     }
 
     /**

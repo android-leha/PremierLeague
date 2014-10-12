@@ -20,6 +20,11 @@ class Team implements \JsonSerializable
      */
     private $score;
 
+    /**
+     * @param Team $firstTeam
+     * @param Team $secondTeam
+     * @return array
+     */
     public static function playGame(Team $firstTeam, Team $secondTeam)
     {
         $firstScore = floor(pow(rand(0, 5), $firstTeam->power / $secondTeam->power));
@@ -41,12 +46,34 @@ class Team implements \JsonSerializable
         $firstTeam->getScore()->p++;
         $firstTeam->getScore()->gf += $firstScore;
         $firstTeam->getScore()->ga += $secondScore;
+
+        $secondTeam->getScore()->p++;
+        $secondTeam->getScore()->ga += $firstScore;
+        $secondTeam->getScore()->gf += $secondScore;
         return [
             'firstTeam' => $firstTeam->__toString(),
             'secondTeam' => $secondTeam->__toString(),
             'firstScore' => $firstScore,
             'secondScore' => $secondScore,
         ];
+    }
+
+    public function getAttackPower()
+    {
+        if ($this->getScore()->p > 0) {
+            return $this->getScore()->gf / $this->getScore()->p;
+        } else {
+            return 0;
+        }
+    }
+
+    public function getDefencePower()
+    {
+        if ($this->getScore()->p > 0) {
+            return $this->getScore()->ga / $this->getScore()->p;
+        } else {
+            return 0;
+        }
     }
 
     public function __construct($name, $power)
